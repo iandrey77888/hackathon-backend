@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"name": "kontorskii-frontend",
+			"path": "../../kontorskii-frontend"
+		},
+		{
+			"name": "hackathon-back",
+			"path": "../../kontorskii-backend/hackathon-back"
+		},
+		{
+			"name": "kontorskii-ocr",
+			"path": ".."
+		}
+	],
+	"settings": {
+		"java.configuration.updateBuildConfiguration": "disabled"
+	}
+}
