@@ -11,11 +11,11 @@
 ## OpenAPI
 http://127.0.0.1:8000/docs - при запущенном приложении постучать на роут docs
 ## Деплой через Docker
-
+'''
 docker compose up -d
 docker build -t hackathon-backend .
 docker run --network kontorskii-backend_default -p 8002:8002 --name hackathon-backend -d hackathon-backend
-
+'''
 ### Дополнительно
 - admin/password
 - propab/prorab
