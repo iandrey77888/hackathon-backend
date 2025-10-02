@@ -6,7 +6,7 @@ COPY . /code
 
 RUN pip install -r /code/requirements-linux.txt
 
-ENV DB_URL=postgresql+psycopg2://mh_admin:2}0q0D6\\{zLfPB#@kontorskii-backend-db-1:5432/ecmkontorskii
+ENV DB_URL=postgresql+psycopg2://DB_USER:DB_PWD@kontorskii-backend-db-1:5432/ecmkontorskii
 
 WORKDIR /code
 
