@@ -1,0 +1,455 @@
+from sqlalchemy import (
+    Column, Integer, BigInteger, SmallInteger, String, Text, Boolean, Numeric,
+    ForeignKey, DateTime, JSON, UniqueConstraint
+)
+from sqlalchemy.orm import declarative_base, relationship
+from geoalchemy2 import Geometry
+from datetime import datetime
+
+Base = declarative_base()
+
+class BuildSite(Base):
+    __tablename__ = "buildsite"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    coordinates = Column(Geometry("MULTIPOLYGON", srid=4326))
+    state = Column(Integer, nullable=False, default=0)
+    start_date = Column(DateTime)
+    state_changed = Column(DateTime)
+    manager = Column(BigInteger, ForeignKey("hack.users.id"))
+    acceptor = Column(BigInteger, ForeignKey("hack.users.id"))
+
+    manager_rel = relationship("User", foreign_keys=[manager])
+    acceptor_rel = relationship("User", foreign_keys=[acceptor])
+    comments = relationship("Comment", back_populates="site_rel")
+    user_links = relationship("User2Site", back_populates="site_rel")
+    stages = relationship("SiteStage", back_populates="site_rel")
+    documents = relationship("BuildSite2Doc", back_populates="site_rel")
+    checklists = relationship("ChecklistAns", back_populates="site_rel")
+
+
+class User(Base):
+    __tablename__ = "users"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    name = Column(Text)
+    surname = Column(Text)
+    patronym = Column(Text)
+    role = Column(SmallInteger)
+    username = Column(Text, nullable=False)
+    pwdhash = Column(Text)
+
+    comments = relationship("Comment", back_populates="author_rel")
+    uploaded_files = relationship("File", back_populates="uploader_rel")
+    user2site_links = relationship("User2Site", back_populates="user_rel")
+    jobshifts_created = relationship("JobShift", back_populates="creator_rel", foreign_keys='JobShift.creator')
+    jobshifts_checked = relationship("JobShift", back_populates="checker_rel", foreign_keys='JobShift.checker')
+    shipment_accepted = relationship("Shipment", back_populates="acceptor_rel", foreign_keys='Shipment.acceptor')
+    shipment_created = relationship("Shipment", back_populates="supplier_rel", foreign_keys='Shipment.supplier')
+    commentfix_created = relationship("CommentFix", back_populates="creator_rel")
+    commentfix_accepted = relationship("CommentFix", back_populates="acceptor_rel")
+    jobverifications = relationship("JobVerification", back_populates="verifier_rel")
+
+
+class Comment(Base):
+    __tablename__ = "comments"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    site = Column(BigInteger, ForeignKey("hack.buildsite.id"), nullable=False)
+    author = Column(BigInteger, ForeignKey("hack.users.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    state = Column(Integer)
+    comment = Column(Text)
+    fix_time = Column(Integer)
+    docs = Column(Text)
+    geo = Column(Geometry("POINT", srid=4326))
+    type = Column(Integer)
+    rec_type = Column(Integer)
+    linked_job = Column(BigInteger, ForeignKey("hack.sitejob.id"))
+
+    site_rel = relationship("BuildSite", back_populates="comments")
+    author_rel = relationship("User", back_populates="comments")
+    linked_job_rel = relationship("SiteJob", back_populates="comments")
+    files = relationship("Comment2File", back_populates="comment_rel")
+    fixes = relationship("CommentFix", back_populates="comment_rel")
+
+
+class File(Base):
+    __tablename__ = "files"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    file_key = Column(Text)
+    filename = Column(Text)
+    mime_type = Column(Text)
+    size = Column(Text)
+    checksum256 = Column(Text)
+    uploader = Column(BigInteger, ForeignKey("hack.users.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    uploader_rel = relationship("User", back_populates="uploaded_files")
+    comment_links = relationship("Comment2File", back_populates="file_rel")
+    commentfix_links = relationship("CommentFix2File", back_populates="file_rel")
+    prog_links = relationship("Prog2Files", back_populates="file_rel")
+    lab_links = relationship("Lab2File", back_populates="file_rel")
+    shipmentfile_links = relationship("ShipmentFiles", back_populates="file_rel")
+    shipmat_links = relationship("ShipMat2File", back_populates="file_rel")
+    buildsite_links = relationship("BuildSite2Doc", back_populates="file_rel")
+
+
+class User2Site(Base):
+    __tablename__ = "user2site"
+    __table_args__ = {'schema': 'hack'}
+
+    userid = Column(BigInteger, ForeignKey("hack.users.id"), primary_key=True)
+    siteid = Column(BigInteger, ForeignKey("hack.buildsite.id"), primary_key=True)
+
+    user_rel = relationship("User", back_populates="user2site_links")
+    site_rel = relationship("BuildSite", back_populates="user_links")
+
+
+class SiteJob(Base):
+    __tablename__ = "sitejob"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    name = Column(Text)
+    description = Column(Text)
+    scheduled = Column(BigInteger, ForeignKey("hack.jobschedule.id"), nullable=False)
+    volume = Column(Numeric)
+    measurement = Column(BigInteger)
+    status = Column(Integer)
+
+    schedule_rel = relationship("JobSchedule", back_populates="jobs")
+    comments = relationship("Comment", back_populates="linked_job_rel")
+    required_materials = relationship("RequiredMats", back_populates="job_rel")
+    progress = relationship("JobProgres", back_populates="linked_job_rel")
+    verifications = relationship("JobVerification", back_populates="linked_job_rel")
+    job2stage_links = relationship("Job2Stage", back_populates="job_rel")
+
+
+class SiteStage(Base):
+    __tablename__ = "sitestage"
+    __table_args__ = (UniqueConstraint("site", "seq"), {'schema': 'hack'})
+
+    id = Column(BigInteger, primary_key=True)
+    site = Column(BigInteger, ForeignKey("hack.buildsite.id"))
+    seq = Column(Integer)
+    name = Column(Text)
+    done = Column(Boolean)
+
+    site_rel = relationship("BuildSite", back_populates="stages")
+    jobs_links = relationship("Job2Stage", back_populates="stage_rel")
+
+
+class Job2Stage(Base):
+    __tablename__ = "job2stage"
+    __table_args__ = {'schema': 'hack'}
+
+    stageid = Column(BigInteger, ForeignKey("hack.sitestage.id"), primary_key=True)
+    jobid = Column(BigInteger, ForeignKey("hack.sitejob.id"), primary_key=True)
+    seq = Column(Integer, nullable=False)
+
+    stage_rel = relationship("SiteStage", back_populates="jobs_links")
+    job_rel = relationship("SiteJob", back_populates="job2stage_links")
+
+
+class JobShift(Base):
+    __tablename__ = "jobshift"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    affected_jobsch = Column(BigInteger, ForeignKey("hack.jobschedule.id"))
+    creator = Column(BigInteger, ForeignKey("hack.users.id"))
+    state = Column(Integer, default=0)
+    description = Column(SmallInteger)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    state_change = Column(DateTime)
+    checker = Column(BigInteger, ForeignKey("hack.users.id"))
+    newstart = Column(DateTime)
+    newend = Column(DateTime)
+    checker_comment = Column(Text)
+
+    creator_rel = relationship("User", back_populates="jobshifts_created", foreign_keys=[creator])
+    checker_rel = relationship("User", back_populates="jobshifts_checked", foreign_keys=[checker])
+    schedule_rel = relationship("JobSchedule", back_populates="jobshifts")
+
+
+class JobSchedule(Base):
+    __tablename__ = "jobschedule"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    version = Column(Integer, default=0)
+    prev = Column(BigInteger)
+    planned_start = Column(DateTime, nullable=False)
+    planned_end = Column(DateTime, nullable=False)
+
+    jobs = relationship("SiteJob", back_populates="schedule_rel")
+    jobshifts = relationship("JobShift", back_populates="schedule_rel")
+
+class Shipment(Base):
+    __tablename__ = "shipment"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    scheduled_at = Column(DateTime)
+    arrived_at = Column(DateTime)
+    supplier = Column(BigInteger, ForeignKey("hack.supplier.id"))
+    state = Column(Integer)
+    comment = Column(Text)
+    acceptor = Column(BigInteger, ForeignKey("hack.users.id"))
+    geo = Column(Geometry("POINT", srid=4326))
+
+    supplier_rel = relationship("Supplier", back_populates="shipments")
+    acceptor_rel = relationship("User", back_populates="shipment_accepted")
+    shipped_mats = relationship("ShippedMats", back_populates="shipment_rel")
+    files = relationship("ShipmentFiles", back_populates="shipment_rel")
+
+
+class Material(Base):
+    __tablename__ = "material"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    name = Column(Text)
+    properties = Column(Text)
+    measurement = Column(Text)
+
+    shipped_mats = relationship("ShippedMats", back_populates="material_rel")
+    required_for_jobs = relationship("RequiredMats", back_populates="material_rel")
+    mat_usage = relationship("MatUsage", back_populates="material_rel")
+    lab_results = relationship("LabRes", back_populates="material_rel")
+    shipmat_files = relationship("ShipMat2File", back_populates="material_rel")
+
+
+class ShippedMats(Base):
+    __tablename__ = "shipped_mats"
+    __table_args__ = {'schema': 'hack'}
+
+    shipmentid = Column(BigInteger, ForeignKey("hack.shipment.id"), primary_key=True)
+    materialid = Column(BigInteger, ForeignKey("hack.material.id"), primary_key=True)
+    volume = Column(Numeric, nullable=False)
+    serial = Column(Text)
+    accepted = Column(Boolean)
+    spent = Column(Numeric)
+    lab_required = Column(Boolean, default=False)
+
+    shipment_rel = relationship("Shipment", back_populates="shipped_mats")
+    material_rel = relationship("Material", back_populates="shipped_mats")
+    mat_usage = relationship("MatUsage", back_populates="shipped_mat_rel")
+    lab_results = relationship("LabRes", back_populates="shipped_mat_rel")
+    shipmat_files = relationship("ShipMat2File", back_populates="shippedmat_rel")
+
+
+class RequiredMats(Base):
+    __tablename__ = "required_mats"
+    __table_args__ = {'schema': 'hack'}
+
+    jobid = Column(BigInteger, ForeignKey("hack.sitejob.id"), primary_key=True)
+    materialid = Column(BigInteger, ForeignKey("hack.material.id"), primary_key=True)
+    volume = Column(Numeric)
+
+    job_rel = relationship("SiteJob", back_populates="required_materials")
+    material_rel = relationship("Material", back_populates="required_for_jobs")
+    mat_usage = relationship("MatUsage", back_populates="required_mat_rel")
+
+
+class MatUsage(Base):
+    __tablename__ = "mat_usage"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    regtime = Column(DateTime, default=datetime.utcnow, nullable=False)
+    sitejob = Column(BigInteger)
+    materialid = Column(BigInteger)
+    shipmentid = Column(BigInteger)
+    spent = Column(BigInteger)
+
+    required_mat_rel = relationship("RequiredMats", primaryjoin="and_(MatUsage.sitejob==RequiredMats.jobid, "
+                                                              "MatUsage.materialid==RequiredMats.materialid)")
+    shipped_mat_rel = relationship("ShippedMats", primaryjoin="and_(MatUsage.shipmentid==ShippedMats.shipmentid, "
+                                                              "MatUsage.materialid==ShippedMats.materialid)")
+    material_rel = relationship("Material", back_populates="mat_usage")
+
+
+class Supplier(Base):
+    __tablename__ = "supplier"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    name = Column(Text)
+
+    shipments = relationship("Shipment", back_populates="supplier_rel")
+
+
+class ShipmentFiles(Base):
+    __tablename__ = "shipment_files"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, ForeignKey("hack.files.id"), primary_key=True)
+    shipment = Column(BigInteger, ForeignKey("hack.shipment.id"))
+    category = Column(Integer)
+    description = Column(Text)
+
+    file_rel = relationship("File", back_populates="shipmentfile_links")
+    shipment_rel = relationship("Shipment", back_populates="files")
+
+
+class LabRes(Base):
+    __tablename__ = "lab_res"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    shipmentid = Column(BigInteger)
+    materialid = Column(BigInteger)
+    result = Column(BigInteger)
+
+    shipped_mat_rel = relationship("ShippedMats", primaryjoin="and_(LabRes.shipmentid==ShippedMats.shipmentid, "
+                                                              "LabRes.materialid==ShippedMats.materialid)")
+    material_rel = relationship("Material", back_populates="lab_results")
+    files = relationship("Lab2File", back_populates="lab_rec_rel")
+
+
+class JobVerification(Base):
+    __tablename__ = "jobverification"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    regtime = Column(DateTime, default=datetime.utcnow)
+    verifier = Column(BigInteger, ForeignKey("hack.users.id"), nullable=False)
+    sitejob = Column(BigInteger, ForeignKey("hack.sitejob.id"))
+    result = Column(Integer)
+    comment = Column(Text)
+    geo = Column(Geometry("POINT", srid=4326))
+
+    verifier_rel = relationship("User", back_populates="jobverifications")
+    linked_job_rel = relationship("SiteJob", back_populates="verifications")
+
+
+class CommentFix(Base):
+    __tablename__ = "comment_fix"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    notice = Column(BigInteger, ForeignKey("hack.comments.id"))
+    created_at = Column(BigInteger)
+    comment = Column(SmallInteger)
+    creator = Column(BigInteger, ForeignKey("hack.users.id"))
+    state = Column(SmallInteger)
+    acceptor = Column(BigInteger, ForeignKey("hack.users.id"))
+    acceptor_comment = Column(SmallInteger)
+    state_changed = Column(DateTime)
+    geo = Column(Geometry("POINT", srid=4326))
+
+    comment_rel = relationship("Comment", back_populates="fixes")
+    creator_rel = relationship("User", back_populates="commentfix_created")
+    acceptor_rel = relationship("User", back_populates="commentfix_accepted")
+    files = relationship("CommentFix2File", back_populates="noticefix_rel")
+
+
+class CommentFix2File(Base):
+    __tablename__ = "commentfix2file"
+    __table_args__ = {'schema': 'hack'}
+
+    noticefix = Column(BigInteger, ForeignKey("hack.comment_fix.id"), primary_key=True)
+    file = Column(BigInteger, ForeignKey("hack.files.id"), primary_key=True)
+
+    noticefix_rel = relationship("CommentFix", back_populates="files")
+    file_rel = relationship("File", back_populates="commentfix_links")
+
+
+class ChecklistTemplate(Base):
+    __tablename__ = "checklist_template"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    name = Column(Text)
+    description = Column(Text)
+    schedule = Column(Integer)
+    questions = Column(JSON)
+
+    answers = relationship("ChecklistAns", back_populates="checklist_rel")
+
+
+class ChecklistAns(Base):
+    __tablename__ = "checklist_ans"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    checklist = Column(BigInteger, ForeignKey("hack.checklist_template.id"))
+    author = Column(BigInteger, ForeignKey("hack.users.id"))
+    linkedsite = Column(BigInteger, ForeignKey("hack.buildsite.id"))
+    answers = Column(JSON)
+    regtime = Column(DateTime, default=datetime.utcnow)
+    geo = Column(Geometry("POINT", srid=4326))
+
+    checklist_rel = relationship("ChecklistTemplate", back_populates="answers")
+    site_rel = relationship("BuildSite", back_populates="checklists")
+    author_rel = relationship("User", back_populates="comments")  # optionally link to checklist author
+
+
+class BuildSite2Doc(Base):
+    __tablename__ = "buildsite2doc"
+    __table_args__ = {'schema': 'hack'}
+
+    buildsite = Column(BigInteger, ForeignKey("hack.buildsite.id"), primary_key=True)
+    file = Column(BigInteger, ForeignKey("hack.files.id"), primary_key=True)
+    type = Column(Integer)
+
+    site_rel = relationship("BuildSite", back_populates="documents")
+    file_rel = relationship("File", back_populates="buildsite_links")
+
+
+class JobProgres(Base):
+    __tablename__ = "jobprogres"
+    __table_args__ = {'schema': 'hack'}
+
+    id = Column(BigInteger, primary_key=True)
+    linkedjob = Column(BigInteger, ForeignKey("hack.sitejob.id"))
+    comment = Column(Text)
+    regtime = Column(DateTime, default=datetime.utcnow)
+    geo = Column(Geometry("POINT", srid=4326))
+
+    linked_job_rel = relationship("SiteJob", back_populates="progress")
+    files = relationship("Prog2Files", back_populates="progres_rel")
+
+
+class Prog2Files(Base):
+    __tablename__ = "prog2files"
+    __table_args__ = {'schema': 'hack'}
+
+    progresrep = Column(BigInteger, ForeignKey("hack.jobprogres.id"), primary_key=True)
+    file = Column(BigInteger, ForeignKey("hack.files.id"), primary_key=True)
+
+    progres_rel = relationship("JobProgres", back_populates="files")
+    file_rel = relationship("File", back_populates="prog_links")
+
+
+class Lab2File(Base):
+    __tablename__ = "lab2file"
+    __table_args__ = {'schema': 'hack'}
+
+    labrec = Column(BigInteger, ForeignKey("hack.lab_res.id"), primary_key=True)
+    file = Column(BigInteger, ForeignKey("hack.files.id"), primary_key=True)
+
+    lab_rec_rel = relationship("LabRes", back_populates="files")
+    file_rel = relationship("File", back_populates="lab_links")
+
+
+class ShipMat2File(Base):
+    __tablename__ = "shipmat2file"
+    __table_args__ = {'schema': 'hack'}
+
+    shippedmat = Column(BigInteger, ForeignKey("hack.shipped_mats.shipmentid"), primary_key=True)
+    file = Column(BigInteger, ForeignKey("hack.files.id"), primary_key=True)
+    materialid = Column(BigInteger, ForeignKey("hack.shipped_mats.materialid"), primary_key=True)
+
+    shippedmat_rel = relationship("ShippedMats", back_populates="shipmat_files")
+    material_rel = relationship("Material", back_populates="shipmat_files")
+    file_rel = relationship("File", back_populates="shipmat_links")
+
+

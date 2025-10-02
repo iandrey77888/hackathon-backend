@@ -1,0 +1,1376 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+ Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel pgmodeler-ver="1.0.4" use-changelog="false" last-position="3308,0" last-zoom="1" max-obj-count="54"
+	 default-schema="public" default-owner="postgres"
+	 layers="Default layer"
+	 active-layers="0"
+	 layer-name-colors="#000000"
+	 layer-rect-colors="#b4b4b4"
+	 show-layer-names="false" show-layer-rects="false">
+<role name="mh_admin"
+ createdb="true"
+ login="true"
+ password="mh_admin">
+</role>
+
+<role name="mh_admin_cp"
+ createdb="true"
+ login="true"
+ password="mh_admin">
+</role>
+
+<tablespace name="hacktbsp" directory="'/hacktbsp/'">
+	<role name="mh_admin"/>
+</tablespace>
+
+<database name="mh_db" is-template="false" allow-conns="true">
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+</database>
+
+<schema name="public" layers="0" rect-visible="true" fill-color="#e1e1e1" sql-disabled="true">
+</schema>
+
+<schema name="hack" layers="0" rect-visible="true" fill-color="#e1e1e1">
+	<role name="mh_admin"/>
+</schema>
+
+<table name="buildsite" layers="0" collapse-mode="2" max-obj-count="9" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="3800" y="2020"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="sitename">
+		<type name="text" length="0"/>
+	</column>
+	<column name="coordinates">
+		<type name="text" length="0"/>
+	</column>
+	<column name="state" not-null="true" default-value="0">
+		<type name="integer" length="0"/>
+		<comment> <![CDATA[-1 - stopped
+0 - planning
+1 - started]]> </comment>
+	</column>
+	<column name="start_date">
+		<type name="timestamp" length="0"/>
+		<comment> <![CDATA[If not started - planned date
+If started - real date]]> </comment>
+	</column>
+	<column name="state_changed">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="manager">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="acceptor">
+		<type name="bigint" length="0"/>
+	</column>
+	<constraint name="buildsite_pk" type="pk-constr" table="hack.buildsite">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="bu" layers="0" collapse-mode="2" max-obj-count="0" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="280" y="20"/>
+</table>
+
+<table name="users" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="5220" y="1220"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="name">
+		<type name="text" length="0"/>
+	</column>
+	<column name="surname">
+		<type name="text" length="0"/>
+	</column>
+	<column name="patronym">
+		<type name="text" length="0"/>
+	</column>
+	<column name="role">
+		<type name="smallint" length="0"/>
+		<comment> <![CDATA[0 - owner
+1 - contractor
+2 - inspector]]> </comment>
+	</column>
+	<column name="username" not-null="true">
+		<type name="text" length="0"/>
+	</column>
+	<column name="pwdhash">
+		<type name="text" length="0"/>
+	</column>
+	<constraint name="users_pk" type="pk-constr" table="hack.users">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="username_uq" type="uq-constr" table="hack.users">
+		<columns names="username" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="comments" layers="0" collapse-mode="2" max-obj-count="16" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="5380" y="2360"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="site" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="author">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="created_at" default-value="now()">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="state">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="comment">
+		<type name="text" length="0"/>
+	</column>
+	<column name="fix_time">
+		<type name="integer" length="0"/>
+		<comment> <![CDATA[days]]> </comment>
+	</column>
+	<column name="docs">
+		<type name="text" length="0"/>
+	</column>
+	<column name="geo">
+		<type name="smallint" length="0"/>
+	</column>
+	<column name="type">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="rec_type">
+		<type name="integer" length="0"/>
+		<comment> <![CDATA[0 - notice
+1 - warning]]> </comment>
+	</column>
+	<column name="linked_job">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="witness">
+		<type name="text" length="0"/>
+	</column>
+	<column name="document_list">
+		<type name="text" length="0"/>
+	</column>
+	<constraint name="notices_pk" type="pk-constr" table="hack.comments">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="files" layers="0" collapse-mode="2" max-obj-count="9" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="2740" y="2580"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="file_key">
+		<type name="text" length="0"/>
+	</column>
+	<column name="filename">
+		<type name="text" length="0"/>
+	</column>
+	<column name="mime_type">
+		<type name="text" length="0"/>
+	</column>
+	<column name="size">
+		<type name="text" length="0"/>
+	</column>
+	<column name="checksum256">
+		<type name="text" length="0"/>
+	</column>
+	<column name="uploader">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="created_at" not-null="true" default-value="now()">
+		<type name="timestamp" length="0"/>
+	</column>
+	<constraint name="files_pk" type="pk-constr" table="hack.files">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="user2site" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="3680" y="1640"/>
+	<column name="userid" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="siteid" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<constraint name="user2site_pk" type="pk-constr" table="hack.user2site">
+		<columns names="userid,siteid" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="sitejob" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="3560" y="900"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="name">
+		<type name="text" length="0"/>
+	</column>
+	<column name="description">
+		<type name="text" length="0"/>
+	</column>
+	<column name="scheduled" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="volume">
+		<type name="numeric" length="0"/>
+	</column>
+	<column name="measurement">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="status">
+		<type name="integer" length="0"/>
+		<comment> <![CDATA[0 - not started
+1 - started
+2 - finished, unverified
+3 - finished, rejected
+4 - finished, verified]]> </comment>
+	</column>
+	<constraint name="sitejob_pk" type="pk-constr" table="hack.sitejob">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="sitestage" layers="0" collapse-mode="2" max-obj-count="6" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="3360" y="1760"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="site">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="seq">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="name">
+		<type name="text" length="0"/>
+	</column>
+	<column name="done">
+		<type name="boolean" length="0"/>
+	</column>
+	<constraint name="sitestage_pk" type="pk-constr" table="hack.sitestage">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="stageuq_constr" type="uq-constr" table="hack.sitestage">
+		<columns names="site,seq" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="job2stage" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="3360" y="1340"/>
+	<column name="stageid" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="jobid" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="seq" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<constraint name="job2stage_pk" type="pk-constr" table="hack.job2stage">
+		<columns names="stageid,jobid" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="jobshift" layers="0" collapse-mode="2" max-obj-count="13" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="4380" y="680"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="affected_jobsch">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="creator">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="state" default-value="0">
+		<type name="integer" length="0"/>
+		<comment> <![CDATA[0 - proposed
+1 - accepted
+2 - rejected]]> </comment>
+	</column>
+	<column name="description">
+		<type name="text" length="0"/>
+	</column>
+	<column name="created_at" default-value="now()">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="state_change">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="checker">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="newstart">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="newend">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="checker_comment">
+		<type name="text" length="0"/>
+	</column>
+	<constraint name="jobshift_pk" type="pk-constr" table="hack.jobshift">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="jobschedule" layers="0" collapse-mode="2" max-obj-count="6" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="3640" y="600"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="version" default-value="0">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="prev">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="planned_start" not-null="true">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="planned_end" not-null="true">
+		<type name="timestamp" length="0"/>
+	</column>
+	<constraint name="jobschedule_pk" type="pk-constr" table="hack.jobschedule">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="shipment" layers="0" collapse-mode="2" max-obj-count="12" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="3940" y="80"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="scheduled_at">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="arrived_at">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="supplier">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="state">
+		<type name="integer" length="0"/>
+		<comment> <![CDATA[0 - scheduled
+1 - accepted
+2 - rejected ]]> </comment>
+	</column>
+	<column name="comment">
+		<type name="text" length="0"/>
+	</column>
+	<column name="acceptor">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="geo">
+		<type name="text" length="0"/>
+	</column>
+	<column name="doc_serial">
+		<type name="text" length="0"/>
+	</column>
+	<column name="package_state">
+		<type name="text" length="0"/>
+	</column>
+	<constraint name="shipment_pk" type="pk-constr" table="hack.shipment">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="material" layers="0" collapse-mode="2" max-obj-count="4" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="hacktbsp"/>
+	<position x="2520" y="780"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="name">
+		<type name="text" length="0"/>
+	</column>
+	<column name="properties">
+		<type name="text" length="0"/>
+	</column>
+	<column name="measurement">
+		<type name="text" length="0"/>
+	</column>
+	<constraint name="material_pk" type="pk-constr" table="hack.material">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="shipped_mats" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="2100" y="620"/>
+	<column name="shipmentid" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="materialid" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="volume" not-null="true">
+		<type name="numeric" length="0"/>
+	</column>
+	<column name="serial">
+		<type name="text" length="0"/>
+	</column>
+	<column name="accepted">
+		<type name="boolean" length="0"/>
+	</column>
+	<column name="spent">
+		<type name="numeric" length="0"/>
+	</column>
+	<column name="lab_required" default-value="false">
+		<type name="boolean" length="0"/>
+	</column>
+	<constraint name="bu_cp_pk" type="pk-constr" table="hack.shipped_mats">
+		<columns names="shipmentid,materialid" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="required_mats" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="3060" y="820"/>
+	<column name="jobid" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="materialid" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="volume">
+		<type name="numeric" length="0"/>
+	</column>
+	<constraint name="required_mats_pk" type="pk-constr" table="hack.required_mats">
+		<columns names="jobid,materialid" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="mat_usage" layers="0" collapse-mode="2" max-obj-count="7" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="2280" y="1020"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="regtime" not-null="true" default-value="now()">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="sitejob">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="materialid">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="shipmentid">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="spent">
+		<type name="bigint" length="0"/>
+	</column>
+	<constraint name="mat_usage_pk" type="pk-constr" table="hack.mat_usage">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="supplier" layers="0" collapse-mode="2" max-obj-count="2" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="3480" y="60"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="name">
+		<type name="text" length="0"/>
+	</column>
+	<constraint name="supplier_pk" type="pk-constr" table="hack.supplier">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="shipment_files" layers="0" collapse-mode="2" max-obj-count="4" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="4360" y="60"/>
+	<column name="id" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="shipment">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="category">
+		<type name="integer" length="0"/>
+		<comment> <![CDATA[File category
+0 - shipment docs
+1 - certificates
+2 - misc]]> </comment>
+	</column>
+	<column name="description">
+		<type name="text" length="0"/>
+	</column>
+	<constraint name="shipment_files_pk" type="pk-constr" table="hack.shipment_files">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="lab_res" layers="0" collapse-mode="2" max-obj-count="4" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="1660" y="480"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="shipmentid">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="materialid">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="result">
+		<type name="bigint" length="0"/>
+	</column>
+	<constraint name="labship_pk" type="pk-constr" table="hack.lab_res">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="jobverification" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="4540" y="1060"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="regtime" not-null="true" default-value="now()">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="verifier" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="sitejob">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="result">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="comment">
+		<type name="text" length="0"/>
+	</column>
+	<column name="geo">
+		<type name="text" length="0"/>
+	</column>
+	<constraint name="jobverification_pk" type="pk-constr" table="hack.jobverification">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="comment2file" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="4820" y="2760"/>
+	<column name="notice" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="file" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="description">
+		<type name="smallint" length="0"/>
+	</column>
+	<constraint name="notice2file_pk" type="pk-constr" table="hack.comment2file">
+		<columns names="notice,file" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="comment_fix" layers="0" collapse-mode="2" max-obj-count="12" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="5120" y="1860"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="notice">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="created_at">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="comment">
+		<type name="smallint" length="0"/>
+	</column>
+	<column name="creator">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="state">
+		<type name="smallint" length="0"/>
+		<comment> <![CDATA[0 - pending
+1 - accepted
+2 - rejected]]> </comment>
+	</column>
+	<column name="acceptor">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="acceptor_comment">
+		<type name="smallint" length="0"/>
+	</column>
+	<column name="state_changed">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="geo">
+		<type name="text" length="0"/>
+	</column>
+	<constraint name="notice_fix_pk" type="pk-constr" table="hack.comment_fix">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="commentfix2file" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="4840" y="2580"/>
+	<column name="noticefix" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="file" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<constraint name="noticefix2file_pk" type="pk-constr" table="hack.commentfix2file">
+		<columns names="noticefix,file" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<index name="comment_type_notice_idx" table="hack.comments"
+	 concurrent="false" unique="false" fast-update="false" buffering="false"
+	 index-type="btree" factor="0">
+		<idxelement use-sorting="false">
+			<column name="id"/>
+		</idxelement>
+	<predicate> <![CDATA[rec_type = 0]]> </predicate>
+	<columns names="id"/>
+</index>
+
+<table name="checklist_template" layers="0" collapse-mode="2" max-obj-count="6" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="3060" y="3080"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="name">
+		<type name="text" length="0"/>
+	</column>
+	<column name="description">
+		<type name="text" length="0"/>
+	</column>
+	<column name="schedule">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="questions">
+		<type name="jsonb" length="0"/>
+	</column>
+	<constraint name="checllist_template_pk" type="pk-constr" table="hack.checklist_template">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="buildsite2doc" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="3360" y="2180"/>
+	<column name="buildsite" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="file" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="type">
+		<type name="integer" length="0"/>
+	</column>
+	<constraint name="buildsite2doc_pk" type="pk-constr" table="hack.buildsite2doc">
+		<columns names="buildsite,file" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="jobprogres" layers="0" collapse-mode="2" max-obj-count="7" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="2920" y="1160"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="linkedjob">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="comment">
+		<type name="text" length="0"/>
+	</column>
+	<column name="regtime" not-null="true" default-value="now()">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="geo">
+		<type name="text" length="0"/>
+	</column>
+	<column name="volume">
+		<type name="numeric" length="0"/>
+	</column>
+	<constraint name="jobprogres_pk" type="pk-constr" table="hack.jobprogres">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="prog2files" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="2700" y="1460"/>
+	<column name="progresrep" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="file" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<constraint name="prog2files_pk" type="pk-constr" table="hack.prog2files">
+		<columns names="progresrep,file" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="lab2file" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="1380" y="480"/>
+	<column name="labrec" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="file" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<constraint name="lab2file_pk" type="pk-constr" table="hack.lab2file">
+		<columns names="labrec,file" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="shipmat2file" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="1680" y="760"/>
+	<column name="shippedmat" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="file" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="materialid" not-null="true">
+		<type name="bigint" length="0"/>
+	</column>
+	<constraint name="shipmat2file_pk" type="pk-constr" table="hack.shipmat2file">
+		<columns names="shippedmat,file,materialid" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="checklist_ans" layers="0" collapse-mode="2" max-obj-count="8" z-value="0">
+	<schema name="hack"/>
+	<role name="mh_admin"/>
+	<tablespace name="pg_default"/>
+	<position x="3720" y="3000"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="checklist">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="author">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="linkedsite">
+		<type name="bigint" length="0"/>
+	</column>
+	<column name="answers">
+		<type name="jsonb" length="0"/>
+	</column>
+	<column name="regtime" default-value="now()">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="geo">
+		<type name="text" length="0"/>
+	</column>
+	<constraint name="checklist_ans_pk" type="pk-constr" table="hack.checklist_ans">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<constraint name="notice2author" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.users" table="hack.comments">
+	<columns names="author" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="notice2site" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.buildsite" table="hack.comments">
+	<columns names="site" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="comment2job" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.sitejob" table="hack.comments">
+	<columns names="linked_job" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fileuploader2user" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.users" table="hack.files">
+	<columns names="uploader" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="user2site_site" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.buildsite" table="hack.user2site">
+	<columns names="siteid" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="user2site_user" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.users" table="hack.user2site">
+	<columns names="userid" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="job2sched" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.jobschedule" table="hack.sitejob">
+	<columns names="scheduled" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="site2sitestage" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.buildsite" table="hack.sitestage">
+	<columns names="site" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="j2s_stage" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.sitestage" table="hack.job2stage">
+	<columns names="stageid" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="j2s_job" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.sitejob" table="hack.job2stage">
+	<columns names="jobid" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="shift2job" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.jobschedule" table="hack.jobshift">
+	<columns names="affected_jobsch" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="shift2creator" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.users" table="hack.jobshift">
+	<columns names="creator" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="shift2checker" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.users" table="hack.jobshift">
+	<columns names="checker" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="shipment2supplier" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.supplier" table="hack.shipment">
+	<columns names="supplier" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="shipment2acceptor" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.users" table="hack.shipment">
+	<columns names="acceptor" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="shmat2shipment" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.shipment" table="hack.shipped_mats">
+	<columns names="shipmentid" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="shmat2mat" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.material" table="hack.shipped_mats">
+	<columns names="materialid" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="reqmat2job" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.sitejob" table="hack.required_mats">
+	<columns names="jobid" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="reqmat2mat" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.material" table="hack.required_mats">
+	<columns names="materialid" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="matspent2req" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.required_mats" table="hack.mat_usage">
+	<columns names="sitejob,materialid" ref-type="src-columns"/>
+	<columns names="jobid,materialid" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="matspent2ship" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.shipped_mats" table="hack.mat_usage">
+	<columns names="materialid,shipmentid" ref-type="src-columns"/>
+	<columns names="materialid,shipmentid" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="shipmentfile2file" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.files" table="hack.shipment_files">
+	<columns names="id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="shipmentfile2shipment" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.shipment" table="hack.shipment_files">
+	<columns names="shipment" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="lab2ship" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.shipped_mats" table="hack.lab_res">
+	<columns names="shipmentid,materialid" ref-type="src-columns"/>
+	<columns names="shipmentid,materialid" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="ver2job" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.sitejob" table="hack.jobverification">
+	<columns names="sitejob" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="ver2verifier" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.users" table="hack.jobverification">
+	<columns names="verifier" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="nf2notice" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.comments" table="hack.comment2file">
+	<columns names="notice" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="nf2file" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.files" table="hack.comment2file">
+	<columns names="file" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fix2notice" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.comments" table="hack.comment_fix">
+	<columns names="notice" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fix2author" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.users" table="hack.comment_fix">
+	<columns names="creator" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="fix2acceptor" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.users" table="hack.comment_fix">
+	<columns names="acceptor" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="nfixfile2fix" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.comment_fix" table="hack.commentfix2file">
+	<columns names="noticefix" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="ntfixfile2file" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.files" table="hack.commentfix2file">
+	<columns names="file" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="sitedoc2site" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.buildsite" table="hack.buildsite2doc">
+	<columns names="buildsite" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="sitedoc2doc" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.files" table="hack.buildsite2doc">
+	<columns names="file" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="linkedjob2job" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.sitejob" table="hack.jobprogres">
+	<columns names="linkedjob" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="progfile2prog" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.jobprogres" table="hack.prog2files">
+	<columns names="progresrep" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="progfile2file" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.files" table="hack.prog2files">
+	<columns names="file" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="labfile2labrec" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.lab_res" table="hack.lab2file">
+	<columns names="labrec" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="labfile2file" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.files" table="hack.lab2file">
+	<columns names="file" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="shipmatfile2mat" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.shipped_mats" table="hack.shipmat2file">
+	<columns names="shippedmat,materialid" ref-type="src-columns"/>
+	<columns names="shipmentid,materialid" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="shipmatfile2file" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.files" table="hack.shipmat2file">
+	<columns names="file" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="ans2check" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.checklist_template" table="hack.checklist_ans">
+	<columns names="checklist" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="ans2site" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.buildsite" table="hack.checklist_ans">
+	<columns names="linkedsite" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="ans2author" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="hack.users" table="hack.checklist_ans">
+	<columns names="author" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<relationship name="rel_user2site_buildsite" type="relfk" layers="0"
+	 src-table="hack.user2site"
+	 dst-table="hack.buildsite" reference-fk="user2site_site"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_user2site_users" type="relfk" layers="0"
+	 src-table="hack.user2site"
+	 dst-table="hack.users" reference-fk="user2site_user"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_sitestage_buildsite" type="relfk" layers="0"
+	 src-table="hack.sitestage"
+	 dst-table="hack.buildsite" reference-fk="site2sitestage"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_job2stage_sitestage" type="relfk" layers="0"
+	 src-table="hack.job2stage"
+	 dst-table="hack.sitestage" reference-fk="j2s_stage"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_job2stage_sitejob" type="relfk" layers="0"
+	 src-table="hack.job2stage"
+	 dst-table="hack.sitejob" reference-fk="j2s_job"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_jobshift_users" type="relfk" layers="0"
+	 src-table="hack.jobshift"
+	 dst-table="hack.users" reference-fk="shift2creator"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_jobshift_users1" type="relfk" layers="0"
+	 src-table="hack.jobshift"
+	 dst-table="hack.users" reference-fk="shift2checker"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_jobshift_jobschedule" type="relfk" layers="0"
+	 src-table="hack.jobshift"
+	 dst-table="hack.jobschedule" reference-fk="shift2job"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_sitejob_jobschedule" type="relfk" layers="0"
+	 src-table="hack.sitejob"
+	 dst-table="hack.jobschedule" reference-fk="job2sched"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_bu_cp_shipment" type="relfk" layers="0"
+	 src-table="hack.shipped_mats"
+	 dst-table="hack.shipment" reference-fk="shmat2shipment"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_bu_cp_material" type="relfk" layers="0"
+	 src-table="hack.shipped_mats"
+	 dst-table="hack.material" reference-fk="shmat2mat"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_required_mats_sitejob" type="relfk" layers="0"
+	 src-table="hack.required_mats"
+	 dst-table="hack.sitejob" reference-fk="reqmat2job"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_required_mats_material" type="relfk" layers="0"
+	 src-table="hack.required_mats"
+	 dst-table="hack.material" reference-fk="reqmat2mat"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_mat_usage_required_mats" type="relfk" layers="0"
+	 src-table="hack.mat_usage"
+	 dst-table="hack.required_mats" reference-fk="matspent2req"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_mat_usage_shipped_mats" type="relfk" layers="0"
+	 src-table="hack.mat_usage"
+	 dst-table="hack.shipped_mats" reference-fk="matspent2ship"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_shipment_supplier" type="relfk" layers="0"
+	 src-table="hack.shipment"
+	 dst-table="hack.supplier" reference-fk="shipment2supplier"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_shipment_files_files" type="relfk" layers="0"
+	 src-table="hack.shipment_files"
+	 dst-table="hack.files" reference-fk="shipmentfile2file"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_shipment_files_shipment" type="relfk" layers="0"
+	 src-table="hack.shipment_files"
+	 dst-table="hack.shipment" reference-fk="shipmentfile2shipment"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_lab_res_shipped_mats" type="relfk" layers="0"
+	 src-table="hack.lab_res"
+	 dst-table="hack.shipped_mats" reference-fk="lab2ship"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_jobverification_sitejob" type="relfk" layers="0"
+	 src-table="hack.jobverification"
+	 dst-table="hack.sitejob" reference-fk="ver2job"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_jobverification_users" type="relfk" layers="0"
+	 src-table="hack.jobverification"
+	 dst-table="hack.users" reference-fk="ver2verifier"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_notices_users" type="relfk" layers="0"
+	 src-table="hack.comments"
+	 dst-table="hack.users" reference-fk="notice2author"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_notices_buildsite" type="relfk" layers="0"
+	 src-table="hack.comments"
+	 dst-table="hack.buildsite" reference-fk="notice2site"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_notice2file_notices" type="relfk" layers="0"
+	 src-table="hack.comment2file"
+	 dst-table="hack.comments" reference-fk="nf2notice"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_notice2file_files" type="relfk" layers="0"
+	 src-table="hack.comment2file"
+	 dst-table="hack.files" reference-fk="nf2file"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_notice_fix_notices" type="relfk" layers="0"
+	 src-table="hack.comment_fix"
+	 dst-table="hack.comments" reference-fk="fix2notice"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_notice_fix_users" type="relfk" layers="0"
+	 src-table="hack.comment_fix"
+	 dst-table="hack.users" reference-fk="fix2author"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_notice_fix_users1" type="relfk" layers="0"
+	 src-table="hack.comment_fix"
+	 dst-table="hack.users" reference-fk="fix2acceptor"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_bu_cp_notice_fix" type="relfk" layers="0"
+	 src-table="hack.commentfix2file"
+	 dst-table="hack.comment_fix" reference-fk="nfixfile2fix"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_bu_cp_files" type="relfk" layers="0"
+	 src-table="hack.commentfix2file"
+	 dst-table="hack.files" reference-fk="ntfixfile2file"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_buildsite2doc_buildsite" type="relfk" layers="0"
+	 src-table="hack.buildsite2doc"
+	 dst-table="hack.buildsite" reference-fk="sitedoc2site"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_buildsite2doc_files" type="relfk" layers="0"
+	 src-table="hack.buildsite2doc"
+	 dst-table="hack.files" reference-fk="sitedoc2doc"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_jobprogres_sitejob" type="relfk" layers="0"
+	 src-table="hack.jobprogres"
+	 dst-table="hack.sitejob" reference-fk="linkedjob2job"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_bu_cp_jobprogres" type="relfk" layers="0"
+	 src-table="hack.prog2files"
+	 dst-table="hack.jobprogres" reference-fk="progfile2prog"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_bu_cp_files1" type="relfk" layers="0"
+	 src-table="hack.prog2files"
+	 dst-table="hack.files" reference-fk="progfile2file"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_lab2file_lab_res" type="relfk" layers="0"
+	 src-table="hack.lab2file"
+	 dst-table="hack.lab_res" reference-fk="labfile2labrec"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_lab2file_files" type="relfk" layers="0"
+	 src-table="hack.lab2file"
+	 dst-table="hack.files" reference-fk="labfile2file"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_bu_cp_shipped_mats" type="relfk" layers="0"
+	 src-table="hack.shipmat2file"
+	 dst-table="hack.shipped_mats" reference-fk="shipmatfile2mat"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_bu_cp_files2" type="relfk" layers="0"
+	 src-table="hack.shipmat2file"
+	 dst-table="hack.files" reference-fk="shipmatfile2file"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_shipment_users" type="relfk" layers="0"
+	 src-table="hack.shipment"
+	 dst-table="hack.users" reference-fk="shipment2acceptor"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_files_users" type="relfk" layers="0"
+	 src-table="hack.files"
+	 dst-table="hack.users" reference-fk="fileuploader2user"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_checklist_ans_checklist_template" type="relfk" layers="0"
+	 src-table="hack.checklist_ans"
+	 dst-table="hack.checklist_template" reference-fk="ans2check"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_checklist_ans_buildsite" type="relfk" layers="0"
+	 src-table="hack.checklist_ans"
+	 dst-table="hack.buildsite" reference-fk="ans2site"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_checklist_ans_users" type="relfk" layers="0"
+	 src-table="hack.checklist_ans"
+	 dst-table="hack.users" reference-fk="ans2author"
+	 src-required="false" dst-required="false"/>
+
+<relationship name="rel_comments_sitejob" type="relfk" layers="0"
+	 src-table="hack.comments"
+	 dst-table="hack.sitejob" reference-fk="comment2job"
+	 src-required="false" dst-required="false"/>
+
+</dbmodel>

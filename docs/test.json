@@ -1,0 +1,43 @@
+{
+   "$schema": "http://json-schema.org/draft-04/schema#",
+   "title": "TtnScanData",
+   "description": "",
+   "type": "object",
+  
+   "properties": {
+  
+      "serial": {
+         "description": "Номер накладной",
+         "type": "integer"
+      },
+    
+      "supplier": {
+         "description": "Название компании поставщика",
+         "type": "string"
+      },
+    
+      "price": {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "Название груза",
+                "type": "string"
+              },
+              "volume": {
+                "description": "Количество груза по накладной",
+                "type": "integer"
+              },
+              "message": {
+                "description": "Единица измерения груза",
+                "type": "string"
+             }
+            }
+        }
+      }
+
+   },
+  
+   "required": ["id", "name", "price"]
+}

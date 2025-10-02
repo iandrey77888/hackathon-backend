@@ -1,0 +1,24 @@
+hackathon-back/
+  requirements-windows.txt
+  requirements-linux.txt
+  main.py
+  core/
+    config.py
+    database.py
+    logger.py
+  repositories/
+    user_repository.py
+  models/
+    schemas/
+      hack.py
+    domain/
+      hack.py
+  logs/
+    app.log
+  api/
+    dependencies.py
+    routers/
+      users.py
+      test.py
+  services/
+    auth_service.py
